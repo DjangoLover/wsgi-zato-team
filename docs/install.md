@@ -1,12 +1,14 @@
 Installing on Ubuntu 12.04 from scratch
 =======================================
 
-* Prerequisites
+Prerequisites
+-------------
 
   user$ sudo apt-get install redis-server
   user$ sudo apt-get install postgresql-9.1
 
-* Set up PostgreSQL
+Set up PostgreSQL
+-----------------
 
   user$ sudo su - postgres
   postgres$ createuser --no-superuser --no-createdb --no-createrole zato1
@@ -14,7 +16,8 @@ Installing on Ubuntu 12.04 from scratch
   postgres$ psql --dbname zato1 --command="ALTER ROLE zato1 WITH PASSWORD 'zato1'"
   postgres$ exit
 
-* Install Zato binaries
+Install Zato binaries
+---------------------
 
   user$ mkdir -p ~/tmp/zato-inst
   user$ cd ~/tmp/zato-inst
@@ -22,15 +25,18 @@ Installing on Ubuntu 12.04 from scratch
   user$ curl -O https://zato.io/hotfixes/hotfixman.sh && bash hotfixman.sh
   user$ ./install.sh
 
-* Create a quickstart environment
+Create a quickstart environment
+-------------------------------
 
   user$ rm -rf ~/tmp/qs-1/ && mkdir ~/tmp/qs-1 && cd ~/tmp/qs-1/ && \
     zato quickstart create ~/tmp/qs-1/ postgresql localhost 5432 zato1 zato1 \
     localhost 6379 --odb_password zato1 --verbose
 
-* Start the environment
+Start the environment
+---------------------
 
   user$ cd ~/tmp/qs-1
   user$ ./zato-qs-start
 
-* Navigate to http://localhost:8183/ and create the necessary server objects
+Create server objects
+---------------------
