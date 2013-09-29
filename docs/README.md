@@ -1,7 +1,7 @@
 README
 ======
 
-* This repo contains code for `Zato <https://zato.io/docs/index.html>`_ entry to WSGI Wrestle 2013 (http://wsgiwrestle.com/)
+* This repo contains code for [Zato](https://zato.io/docs/index.html) entry to WSGI Wrestle 2013 (http://wsgiwrestle.com/)
 
 * Functionality implemented is a Redis-based cache for exchange rates as returned by Yahoo!
 
