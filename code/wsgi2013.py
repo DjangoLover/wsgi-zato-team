@@ -7,7 +7,7 @@ Licensed under LGPLv3, see LICENSE.txt for terms and conditions.
 """
 
 # stdlib
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 # bunch
@@ -16,11 +16,15 @@ from bunch import Bunch
 # lxml
 from lxml.objectify import fromstring
 
+# retools
+from retools.lock import Lock 
+
 # Zato
 from zato.server.service import Service
 
 PAIRS_KEY = 'exchange:pairs'
 RATES_PATTERN = 'exchange:rates:{}'
+UPDATE_LOCK = 'exchange:update-lock'
 
 # ##############################################################################
 
@@ -105,31 +109,60 @@ class UpdateCache(Service):
         
     def handle(self):
         
-        # We always use UTC
-        today = str(datetime.utcnow().date())
-        
-        # Key in the cache that data concerning current date and given currencies
-        # is stored under
-        cache_key  = RATES_PATTERN.format(self.request.input.pair)
-        
-        # Fetch currently cached value, if any has been already stored at all
-        old_value = Decimal(self.kvdb.conn.hget(cache_key, today) or 0)
-        
-        # Fetch new data from the backend
-        response = self.invoke(FetchRates.get_name(), {'pair':self.request.input.pair})
-        new_value = Decimal(response['response']['rate'])
-        
-        # Either use the new value directly (because there wasn't any old one)
-        # or find the average of old and new one
-        new_value = new_value if not old_value else (old_value+new_value)/2
-        
-        # Store the new value in cache
-        self.kvdb.conn.hset(cache_key, today, new_value)
+        # Grab a distributed lock so concurrent updates don't interfere with each other
+        with Lock(UPDATE_LOCK):
+            
+            # We always use UTC
+            today = str(datetime.utcnow().date())
+            
+            # Key in the cache that data concerning current date and given currencies
+            # is stored under
+            cache_key  = RATES_PATTERN.format(self.request.input.pair)
+            
+            # Fetch currently cached value, if any has been already stored at all
+            old_value = Decimal(self.kvdb.conn.hget(cache_key, today) or 0)
+            
+            # Fetch new data from the backend
+            response = self.invoke(FetchRates.get_name(), {'pair':self.request.input.pair})
+            new_value = Decimal(response['response']['rate'])
+            
+            # Either use the new value directly (because there wasn't any old one)
+            # or find the average of old and new one
+            new_value = new_value if not old_value else (old_value+new_value)/2
+            
+            # Store the new value in cache
+            self.kvdb.conn.hset(cache_key, today, new_value)
         
 class TrimCache(Service):
     """ Removes parts of cache so it doesn't contain any entries regarding dates
-    prior to the one given on input.
+    older than what was given on input.
     """
+    def handle(self):
+        
+        # last_permitted is the earliest possible date to keep in the cache,
+        # any values earlier than that one will be deleted.
+        today = datetime.utcnow().date()
+        last_permitted = str(today - timedelta(days=int(self.request.raw_request)))
+        
+        # Grab a distributed lock to safely update the contents of the cache
+        with Lock(UPDATE_LOCK):
+            
+            # Values are deleted as part of an either-or transaction pipeline. 
+            # Either all will be deleted or none will be.
+            with self.kvdb.conn.pipeline() as p:
+                
+                # Find all pairs that need to be deleted and add them to pipeline
+                for key in self.kvdb.conn.keys(RATES_PATTERN.format('*')):
+                    for date in self.kvdb.conn.hkeys(key):
+                        if date < last_permitted:
+                            p.hdel(key, date)
+                            
+                            # Output message to logs so users understand
+                            # there's some activity going on
+                            self.logger.info('Deleting {}/{}'.format(key, date))
+                            
+                # Execute the whole transaction as a single unit
+                p.execute()
 
 # ##############################################################################
 
