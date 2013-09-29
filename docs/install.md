@@ -79,6 +79,7 @@ Create server objects
    ![](./dispatch-update-cache.png)
  
  * Create a scheduler job for trimming the cache (Scheduler -> (Create) interval-based
+ 
    *Note that extra data is 30*
  
    ![](./trim-cache.png)
@@ -88,6 +89,4 @@ That's all
 
 This is all as far as installation goes.
 
-Check out the accompanying blog post at  
-https://zato.io/blog/posts/json-driven-redis-backed-analytical-cache-yql-python-zato-esb.html
-for more information and discussion.
+Check out the accompanying blog post at https://zato.io/blog/posts/json-driven-redis-backed-analytical-cache-yql-python-zato-esb.html for more information and discussion.
