@@ -83,6 +83,15 @@ Create server objects
    *Note that extra data is 30*
  
    ![](./trim-cache.png)
+   
+
+  * Expose a couple of service through HTTP and JSON (Connections -> Channels -> Plain HTTP)
+  
+    ![](./plain-http-channels.png)
+    
+    ![](./get-rate.png)
+    
+    ![](./create-exchange-pair.png)
  
 That's all
 ----------
