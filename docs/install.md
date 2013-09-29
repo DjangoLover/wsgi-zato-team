@@ -4,8 +4,10 @@ Installing on Ubuntu 12.04 from scratch
 Prerequisites
 -------------
 
-  user$ sudo apt-get install redis-server
-  user$ sudo apt-get install postgresql-9.1
+```bash
+    user$ sudo apt-get install redis-server
+    user$ sudo apt-get install postgresql-9.1
+```
 
 Set up PostgreSQL
 -----------------
