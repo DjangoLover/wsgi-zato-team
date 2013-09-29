@@ -50,3 +50,22 @@ Start the environment
 
 Create server objects
 ---------------------
+
+ * Log into web admin at http://localhost:8183/ using credentials printed out
+   on screen when creating a quickstart environment
+   
+ * Create an outgoing HTTP connection to Yahoo! YQL (Connections -> Outgoing -> Plain HTTP)
+ 
+   ![](./outconn-http-menu.png)
+   
+   ![](./outconn-http-create.png)
+ 
+ * Create a scheduler job for updating the cache (Scheduler -> (Create) interval-based
+ 
+ * Create a scheduler job for trimming the cache (Scheduler -> (Create) interval-based
+ 
+That's all
+----------
+
+This is all that there is to it. Check out the accompanying blog post at ZZZ
+for more information and discussion.
