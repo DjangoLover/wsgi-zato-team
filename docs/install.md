@@ -48,6 +48,20 @@ Start the environment
     user$ ./zato-qs-start
 ```
 
+Clone the code repository
+-------------------------
+
+```bash
+    user$ git clone https://github.com/zatosource/wsgi-zato-team.git
+```
+
+Hot-deploy the services
+-----------------------
+
+```bash
+    user$ cp ./wsgi-zato-team/code/wsgi2013.py ~/tmp/qs-1/server1/pickup-dir
+```
+
 Create server objects
 ---------------------
 
@@ -62,10 +76,18 @@ Create server objects
  
  * Create a scheduler job for updating the cache (Scheduler -> (Create) interval-based
  
+   ![](./dispatch-update-cache.png)
+ 
  * Create a scheduler job for trimming the cache (Scheduler -> (Create) interval-based
+   *Note that extra data is 30*
+ 
+   ![](./trim-cache.png)
  
 That's all
 ----------
 
-This is all that there is to it. Check out the accompanying blog post at ZZZ
+This is all as far as installation goes.
+
+Check out the accompanying blog post at  
+https://zato.io/blog/posts/json-driven-redis-backed-analytical-cache-yql-python-zato-esb.html
 for more information and discussion.
